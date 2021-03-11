@@ -1,0 +1,13 @@
+\BOOKMARK [1][-]{section.1}{Instalation}{}% 1
+\BOOKMARK [2][-]{subsection.1.1}{Grib2}{section.1}% 2
+\BOOKMARK [2][-]{subsection.1.2}{Zlib}{section.1}% 3
+\BOOKMARK [2][-]{subsection.1.3}{hdf5}{section.1}% 4
+\BOOKMARK [2][-]{subsection.1.4}{NetCDF C \(Base Library\)}{section.1}% 5
+\BOOKMARK [2][-]{subsection.1.5}{NetCDF Fortran}{section.1}% 6
+\BOOKMARK [2][-]{subsection.1.6}{Pre Brams}{section.1}% 7
+\BOOKMARK [1][-]{section.2}{How it works}{}% 8
+\BOOKMARK [1][-]{section.3}{Getting the data}{}% 9
+\BOOKMARK [2][-]{subsection.3.1}{CAMS Climatology}{section.3}% 10
+\BOOKMARK [2][-]{subsection.3.2}{GFS data}{section.3}% 11
+\BOOKMARK [1][-]{section.4}{namelist for PRE}{}% 12
+\BOOKMARK [1][-]{section.5}{Run PRE}{}% 13

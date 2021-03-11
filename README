@@ -1,0 +1,262 @@
+                  
+                  BRAMS - How to Install & Run small test cases
+
+Author: Luiz Flavio Rodrigues
+
+
+1. Introduction
+
+We supposed You are reading this document then You are in BRAMS directory that keeps it. Memorize the directory.
+
+This document will guide You to install software infrastructure and BRAMS model. BRAMS code is distributed under CC-GPL License. You can download, copy, modify and redistribute the code. Some rights are reserved. We recommend the user to read the license terms on site Creative Commons. More information, documentation, etc You can see in http://brams.cptec.inpe.br/.
+
+BRAMS works with Linux or Unix operational’s systems. As a first approach, we recommend the Linux distribution UBUNTU. 
+
+For all operations You will need a superuser account or permissions for sudo (sudoers).
+
+Please, in order to make the installation easier, make a install directory as You prefer, e.g., ~\> mkdir ~/install
+
+
+
+====================================================================
+PLEASE, READ CAREFULLY EACH OF THE STEPS (2 to 14) BELOW IN ORDER TO 
+                      INSTALL AND RUN THE MODEL.
+====================================================================
+
+
+
+2. Install Fortran & C Compilers and autoconf
+
+
+BRAMS has been tested with the compilers: INTEL® compilers, PGI® compilers, IBM® XL, and GNU Fortran compiler (GPL 🄯). Follow the instructions of each vendor's site to install the compilers. 
+
+In case of uses GFORTRAN/GCC (Gnu compilers) and UBUNTU Linux You can use the "apt-get install" for compilers and libraries.  Before all instalations we recommend:
+
+  (!) Goto install directory: cd ~/install
+   a) Make an update of packages: ~\>sudo apt-get update
+   b) Install the base package : ~\>sudo apt-get install build-essential
+   c) Install the gfortran: ~\>sudo apt-get install gfortran
+   d) Install the M4 for autoconf: ~\> sudo apt-get install m4
+
+   Note:
+
+   *1 If Your prefere other compiler than gfortran/gcc just change (2.c) above.
+   *2 For other Linux flavours use the specific installer:
+   
+       Ubuntu  (kubuntu, xubuntu, lubuntu,etc) - apt, apt-get, dpkg
+       Debian - - apt, apt-get, dpkg
+       Red Hat & CentOS - yum
+       Fedora - dnf
+       FreeBSD - pkg
+
+3. Install MPI Libraries and Software
+
+BRAMS works only in parallel mode. One can run the model using a single processor/core, but must to do it using MPI with the MPIRUN command. We recommend download and install the last version of MPICH stable release.  Also take care to choose the correct version to your OS.
+
+   (!) Goto install directory: cd ~/install
+    a) Download the MPICH: ~\> ~\>wget http://www.mpich.org/static/downloads/3.3/mpich-3.3.tar.gz
+    b) Uncompress: ~\> tar -zxvf mpich-3.3.tar.gz
+    c) goto mpich directory: ~\> cd mpich-3.3
+    d) Configure mpich’s makefile: ~\> ./configure -disable-fast CFLAGS=-O2 FFLAGS=-O2 CXXFLAGS=-O2 FCFLAGS=-O2 -prefix=/opt/mpich3 CC=gcc FC=gfortran F77=gfortran
+    e) make and install: ~\> make; ~\> sudo make install
+
+    Notes:
+
+    *1 -prefix= directory where mpich will be installed when You make the install command;
+    *2 CC= C compiler according You install on step (2) above;
+    *3 FC= Fortran compiler according You install on step (2) above;
+    *4 F77= Use the same as FC
+
+4. Install WGRIB2 package from NCEP:
+
+   (!) Goto install directory: cd ~/install
+    a) Download the libraries: ~\>wget https://www.ftp.cpc.ncep.noaa.gov/wd51we/wgrib2/wgrib2.tgz
+    b) Uncompress: ~\> tar -zxvf wgrib2.tgz
+    c) Go to directory grib2 created: ~\>cd grib2
+    d) Edit (use your editor) the makefile and let the variables as bellow:
+
+     USE_NETCDF3=0
+     USE_NETCDF4=0
+     USE_REGEX=1
+     USE_TIGGE=1
+     USE_MYSQL=0
+     USE_IPOLATES=3
+     USE_SPECTRAL=0
+     USE_UDF=0
+     USE_OPENMP=0
+     USE_PROJ4=0
+     USE_WMO_VALIDATION=0
+     DISABLE_TIMEZONE=0
+     MAKE_FTN_API=1
+     DISABLE_ALARM=0
+
+     USE_G2CLIB=0
+     USE_PNG=0
+     USE_JASPER=0
+     USE_AEC=0
+
+    e) Compile the package: ~\>make CC=gcc FC=gfortran
+    f) Compile the libraries: ~\>make CC=gcc FC=gfortran lib
+    g) We recommend to move the package to a special directory: ~\> sudo mv grib2 /opt
+
+    Notes:
+
+    *1 A new directory will be created (grib2/lib) with libraries and modules
+    *2 The available libraries will be on /opt/grib2/lib ((4.g) above)
+
+5. Install Curl libraries
+
+  (!) Goto install directory: cd ~/install
+   a) Get the package: ~\>wget https://curl.haxx.se/download/curl-7.65.0.tar.gz
+   b) Uncompress: ~\> tar -xzvf curl-7.65.0.tar.gz 
+   c) Go to curl directory: ~\> cd curl-7.65.0
+   d) Make the library: ~\>CC=gcc FC=gfortran ./configure --without-zlib
+   e) Make the library: ~\> make
+   f) Install the library: ~\> sudo make install
+   
+   Note:
+   
+   *1 The curl library will be installed in /usr/local/lib by default
+
+   *2 IMPORTANT: IF YOU ARE USING A CLUSTER ALL THE LIBRARIES MUST BE AVAILABLE ON NODES OR IN SHARED DIRECTORY AMONG NODES.
+
+6. Install M4:
+
+  (!) Goto install directory: cd ~/install
+   a) Get the package: ~\> wget http://ftp.gnu.org/gnu/m4/m4-latest.tar.gz
+   b) Set the library path to system: ~> export LD_LIBRARY_PATH=/usr/local/lib
+   c) Uncompress: ~\> tar -xzvf m4-latest.tar.gz
+   d) Go to M4 directory created: ~\> cd m4-1.4.17
+   e) Configure the library: ~\>./configure 
+   f) Make the library: ~\> make
+   g) Install the library: ~\> sudo make install
+   
+7. Install Zlib
+
+  (!) Goto install directory: cd ~/install
+   a) Get the package: ~\> wget https://www.zlib.net/zlib-1.2.11.tar.xz
+   b) Set the library path to system: ~> export LD_LIBRARY_PATH=/usr/local/lib
+   c) Uncompress: ~\> xz -d zlib-1.2.11.tar.xz
+   d) Go to zlib directory created: ~\> cd zlib-1.2.11
+   e) Configure the library: ~\>./configure 
+   f) Make the library: ~\> make
+   g) Install the library: ~\> sudo make install
+
+8. Install the NetCDF C libraries and packages
+
+  (!) Goto install directory: cd ~/install
+   a) Get the package: ~\> wget ftp://ftp.unidata.ucar.edu/pub/netcdf/netcdf-c-4.7.0.tar.gz
+   b) Set the library path to system: ~> export LD_LIBRARY_PATH=/usr/local/lib
+   c) Uncompress: ~\> tar -xzvf netcdf-c-4.7.0.tar.gz 
+   d) Go to netCDF C directory: ~\> cd netcdf-c-4.7.0
+   e)Configure the library: ~\>FC=gfortran CC=gcc ./configure  --enable-fortran --disable-netcdf-4 --disable-share LT_SYS_LIBRARY_PATH=/usr/local/lib
+   f) Make the library: ~\> make
+   g) Test the library: ~/> make check
+   h) Install the library: ~\> sudo make install
+  
+   Notes:
+  
+   *1 If you are using UBUNTU as linux plataform You can use the default netCDF instalation from apt-get or package manager (synaptic, etc)
+   *2 The NetCDF C library will be installed in /usr/local/lib by default
+   *3 IMPORTANT: IF YOU ARE USING A CLUSTER ALL THE LIBRARIES MUST BE AVAILABLE ON NODES OR IN SHARED DIRECTORY AMONG NODES.
+  
+9. Install the NetCDF Fortran libraries and packages
+
+  (!) Goto install directory: cd ~/install
+   a) Download the package: ~\>wget https://www.unidata.ucar.edu/downloads/netcdf/ftp/netcdf-fortran-4.4.5.tar.gz
+   b) Uncompress the package: ~\>tar -xzvf netcdf-fortran-4.4.5.tar.gz
+   c) Go to directory created: ~\>cd netcdf-fortran-4.4.5
+   d) Configure the package : ~\>FC=gfortran CC=gcc ./configure --enable-fortran --disable-netcdf-4 --disable-shared
+   e) Make the library: ~\> make
+   f) Test the library: ~/> make check
+   g) Install the library: ~\> sudo make install
+   
+   Notes:
+   
+    *1 If you are using UBUNTU as linux plataform You can use the default netCDF instalation from apt-get or package manager (synaptic, etc)
+    *2 The NetCDF C library will be installed in /usr/local/lib by default
+    *3 IMPORTANT: IF YOU ARE USING A CLUSTER ALL THE LIBRARIES MUST BE AVAILABLE ON NODES OR IN SHARED DIRECTORY AMONG NODES.
+
+10. Making BRAMS' Model
+
+
+   (!!!) Goto to BRAMS directory - where You begin!
+
+    a) go to Build directory: ~\> cd build
+    b) Configure the Makefile: ~\>./configure -program-prefix=BRAMS -prefix=/home/xuser -enable-jules -with-chem=RELACS_TUV -with-aer=SIMPLE -with-fpcomp=/opt/mpich3/bin/mpif90 -with-cpcomp=/opt/mpich3/bin/mpicc -with-fcomp=gfortran -with-ccomp=gcc --with-wgrib2=/opt/grib2/lib --with-netcdf=/usr/local/
+    c) Make the model: ~\> make
+    d) Install the Model: ~\> make install
+
+    Notes:
+
+    *1 -prefix= directory where BRAMS will be installed in a "bin directory" bellow the prefix.
+    *2 -with-chem= The chemical to be used (RELACS_TUV, RELACS_MX, CB07_LUT, CB07_TUV, RACM_TUV)
+    *3 -with-aer= aerosol mechanism (SIMPLE or MATRIX(under test))
+    *4 -with-fpcomp= and –with-cpcomp= mpich parallel compiler installed on step 3 above.
+    *5 -with-fcomp= and –with-ccomp= compiler installed on step 2 above.
+    *6 --with-wgrib2= wgrib2 as installed on step 4 above
+    *7 --with-netcdf= NetCDF as installed on step 5 (/usr/local/) above
+
+11. Download tables files (*mandatory)
+
+    a) Open your browser and goto webpage: ftp://ftp.cptec.inpe.br/pesquisa/bramsrd/BRAMS_TABLES/
+    b) goto BRAMS directory and check the BRAMS version: ~> svn info
+       You must receive a Last Change information like "Last Changed Rev: 2001"
+    c) Download the latest tables data revision nearest the model revision. For example: bramsTablesRev2000.tgz (<= revision 2000)
+    d) Move the zipped file on your "bin directory" (see note 1 in section 10 above)
+    e) goto to your "bin directory" and unzip it: ~>tar -xzvf bramsTablesRev2000.tgz
+
+12. Run a Meteorological test case (small test only)
+
+  a) Go to your "bin" area: ~\> cd ~/bin
+  b) Get data: ~/> wget http://ftp.cptec.inpe.br/brams/BRAMS/data/meteo-only.tgz
+  c) Unzip the data: ~\> tar -xzvf meteo-only.tgz
+  d) Make a tmp directory (necessary to Jules): ~\>mkdir ./tmp
+  e) Export the tmp directory: ~\>export TMPDIR=./tmp
+  f) Take care about stack size of your machine. Make it at least 65536 or unlimited : ~\>ulimit -s 65536
+  g) Run the model using mpirun installed on step 3: ~\>/opt/mpich3/bin/mpirun -np 4 ./brams-5.3 -f RAMSIN_meteo-only
+
+Notes:
+
+    *1 -np= the numbers of cores You will use.
+      If You do not know try the command: $ lscpu (see the information about CPU(s)). 
+      Some machine, mainly laptops, may present a overheating when run the model or, in old machines, the O.S. can lock because demands of CPU and memory.
+    *2 ./brams-5.3 – The BRAM’s executable code. Please, point to the directory of code You chose on -program-prefix=BRAMS step 8 above.
+    *3 IMPORTANT: When the model start a lot of logs will be printed on your screen, Pay attention for errors that will be printed during the run. If you got an error and needs for help, please, send a e-mail to atende.cptec@inpe.br and inform the error. Please, attach the log printed on the screen.
+    4* The size of this test is 242,19MB gziped. The time of download (7.c above) depends on the network.
+
+13. Run a Small chemical case (using RELACS_TUV) for laptops and desktops
+
+  a) Get data: ~/> wget http://ftp.cptec.inpe.br/brams/BRAMS/data/meteo-chem.tgz
+  b) Unzip the data: ~\> tar -xzvf meteo-chem.tgz
+  c) Run the model using mpirun installed on step 3: ~\>/opt/mpich3/bin/mpirun -np 4 ./brams-5.3 -f RAMSIN_meteo-chem
+
+  Notes:
+
+    *1 Please, see the notes from *1 to *3 on (7) above.
+    *2 The size of this test is 462,77MB gziped. The time of download (8.c above) depends on the network.
+
+14. Visualize the results with GrADS
+
+BRAMS, by default, writes the output in subdirectory dataout/POSPROCESS. Later you can set others directories and features on namelist file (expert users). The format of the output in POS is in GrADS software (COLA/IGES). You must install GrADS in your computer.
+
+ To see data:
+
+    a) Get the grads on http://cola.gmu.edu/grads/downloads.php. if You use UBUNTU You can get grads using: ~\> sudo apt-get install grads
+    b) Goto pos directory: ~\> cd dataout/POSPROCESS
+    c) Run grads software: ~\> grads -l
+    d) When grads prompt appears on terminal (ga->), you can choose one of the output files, check they by listing: ga-> !ls -latr *.ctl
+    e) Choose one and open it: ga->open METEO-ONLY-A-2015-08-27-030000-g1.ctl (the name is just an example)
+    f)after the file is open You will see information about the file, LON, LAT, LEV, etc.
+    g)list all the variables available in output: ga->q file
+    h) Choose one of them and proceed the plot: ga->d tempc (in this example plotting tempc – temperature)
+
+    Notes:
+
+    *1 You can see more information about Grads on Cola: Grads User’s Guide: http://cola.gmu.edu/grads/gadoc/users.html
+
+
+
+--------------------------------------------------------------------------------------------
+NOTICE: This document is part of BRAMS' Model. Do not distribute it without the entire model.
+--------------------------------------------------------------------------------------------
